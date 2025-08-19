@@ -34,8 +34,7 @@ jobs:
             -e MONGO_COLLECTION_MEMBRO_INICIAL \
             -e MONGO_DB_BACKUP \
             -e MONGO_COLLECTION_BACKUP \
-            etl-backup | tee docker_output.txt
-      
+            etl-backup | tee docker_output.log
 
       - name: Enviar e-mail com log anexado
         if: always()
