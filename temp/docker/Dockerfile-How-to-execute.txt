@@ -1,2 +1,2 @@
-sudo docker build -t etl-service:latest .
-docker run --rm etl-service:latest  
+sudo docker build -t backup-etl:latest .
+docker run --rm backup-etl:latest

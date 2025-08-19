@@ -1,0 +1,50 @@
+name: ETL Backup Diário
+
+# Agenda para rodar todo dia às 02:00 da manhã (UTC)
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch: # permite rodar manualmente
+
+jobs:
+  run-etl:
+    runs-on: ubuntu-latest
+    env:
+      BANCO_INICIAL: ${{ secrets.BANCO_INICIAL }}
+      BANCO_BACKUP: ${{ secrets.BANCO_BACKUP }}
+      MONGO_DB_NAME_INICIAL: ${{ secrets.MONGO_DB_NAME_INICIAL }}
+      MONGO_COLLECTION_MEMBRO_INICIAL: ${{ secrets.MONGO_COLLECTION_MEMBRO_INICIAL }}
+      MONGO_DB_BACKUP: ${{ secrets.MONGO_DB_BACKUP }}
+      MONGO_COLLECTION_BACKUP: ${{ secrets.MONGO_COLLECTION_BACKUP }}
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build e rodar container ETL
+        run: |
+          docker build -t etl-backup .
+          docker run --rm \
+            -e BANCO_INICIAL=$BANCO_INICIAL \
+            -e BANCO_BACKUP=$BANCO_BACKUP \
+            -e MONGO_DB_NAME_INICIAL=$MONGO_DB_NAME_INICIAL \
+            -e MONGO_COLLECTION_MEMBRO_INICIAL=$MONGO_COLLECTION_MEMBRO_INICIAL \
+            -e MONGO_DB_BACKUP=$MONGO_DB_BACKUP \
+            -e MONGO_COLLECTION_BACKUP=$MONGO_COLLECTION_BACKUP \
+            etl-backup
+
+      - name: Enviar e-mail de notificação
+        if: always()  # roda mesmo se o job falhar
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.seuservidor.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "ETL Backup Diário - ${{ job.status }}"
+          body: "O ETL diário foi executado. Status: ${{ job.status }}."
+          to: seuemail@dominio.com
+          from: etl-backup@dominio.com
