@@ -5,9 +5,7 @@ on:
   push:
     branches:
       - main  # Apenas dispara quando houver push nesta branch
-  schedule:
-    - cron: '0 2 * * *'
-  main_dispatch: # permite rodar manualmente
+  workflow_dispatch: # permite rodar manualmente
 
 jobs:
   run-etl:
