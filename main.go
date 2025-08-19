@@ -2,7 +2,6 @@ package main
 
 import (
 	"backup-etl/src/config/database" // pacotes internos para conexão com MongoDB
-	"backup-etl/src/config/env"      // carregamento de variáveis de ambiente
 	"backup-etl/src/exec/input"      // lógica para leitura do banco de input
 	"backup-etl/src/exec/output"     // lógica para escrita no banco de backup
 	"context"
@@ -13,7 +12,7 @@ import (
 
 func main() {
 	// Carrega variáveis do arquivo .env para o ambiente
-	env.LoadEnv()
+	//env.LoadEnv()
 
 	// Contexto global usado em todas as operações MongoDB
 	ctx := context.Background()
