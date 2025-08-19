@@ -4,7 +4,7 @@ name: ETL Backup Diário
 on:
   push:
     branches:
-      - main  # Apenas dispara quando houver push nesta branch
+      - workflows  # Agora dispara quando houver push nesta branch
   workflow_dispatch: # permite rodar manualmente
 
 jobs:
