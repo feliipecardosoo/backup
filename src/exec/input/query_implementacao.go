@@ -4,6 +4,7 @@ import (
 	"backup-etl/src/config/database"
 	"backup-etl/src/config/model"
 	"context"
+	"log"
 	"os"
 	"time"
 
@@ -48,10 +49,17 @@ func (q *Queries) collection() *mongo.Collection {
 func (q *Queries) GetUsersHoje(ctx context.Context) ([]model.Membro, error) {
 	coll := q.collection()
 
-	// Pega a data de hoje no formato dd/MM/yyyy
-	hoje := time.Now().Format("02/01/2006")
+	// Define explicitamente o fuso horário de São Paulo
+	loc, err := time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		return nil, err
+	}
 
-	// Busca no MongoDB todos os documentos com dataModificacao = hoje
+	// Pega a data de hoje no formato dd/MM/yyyy no fuso horário correto
+	hoje := time.Now().In(loc).Format("02/01/2006")
+	log.Printf("Data usada no filtro: %s", hoje)
+
+	// Busca usuários com dataModificacao igual à data de hoje
 	cur, err := coll.Find(ctx, bson.M{
 		"dataModificacao": hoje,
 	})
