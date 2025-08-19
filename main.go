@@ -11,6 +11,8 @@ import (
 )
 
 func main() {
+	log.SetOutput(os.Stdout)
+	log.SetFlags(log.LstdFlags)
 	// Carrega variáveis do arquivo .env para o ambiente
 	//env.LoadEnv()
 
