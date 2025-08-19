@@ -1,0 +1,2 @@
+sudo docker build -t etl-service:latest .
+docker run --rm etl-service:latest  
