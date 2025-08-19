@@ -47,6 +47,6 @@ jobs:
           password: ${{ secrets.SMTP_PASS }}
           subject: "ETL Backup Diário - ${{ job.status }}"
           body: "O ETL diário foi executado. Segue anexo o log completo da execução."
-          to: seuemail@dominio.com
+          to: fglibino@gmail.com
           from: ${{ secrets.SMTP_USER }}
           attachments: docker_output.log
