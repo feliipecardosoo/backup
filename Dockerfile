@@ -10,10 +10,14 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o backup-etl .
 
+# Etapa 2: Container final
 FROM alpine:3.20
 
-# Adiciona certificado raiz (caso o app faça chamadas HTTPS)
-RUN apk add --no-cache ca-certificates
+# Adiciona certificado raiz e timezone
+RUN apk add --no-cache ca-certificates tzdata
+
+# Define timezone de São Paulo
+ENV TZ=America/Sao_Paulo
 
 # Define diretório de trabalho
 WORKDIR /app

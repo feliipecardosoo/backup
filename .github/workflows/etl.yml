@@ -1,11 +1,14 @@
 name: ETL Backup Diário
 
-# Agenda para rodar todo dia às 02:00 da manhã (UTC)
 on:
   push:
     branches:
-      - main  # Apenas dispara quando houver push nesta branch
-  workflow_dispatch: # permite rodar manualmente
+      - workflows
+  workflow_dispatch:
+  schedule:
+    - cron: '0 11 * * *'  # 08:00 BRT
+    - cron: '0 23 * * *'  # 20:00 BRT
+
 
 jobs:
   run-etl:
@@ -28,11 +31,25 @@ jobs:
       - name: Build e rodar container ETL
         run: |
           docker build -t etl-backup .
-          docker run --rm \
+          docker run --rm -t \
             -e BANCO_INICIAL \
             -e BANCO_BACKUP \
             -e MONGO_DB_NAME_INICIAL \
             -e MONGO_COLLECTION_MEMBRO_INICIAL \
             -e MONGO_DB_BACKUP \
             -e MONGO_COLLECTION_BACKUP \
-            etl-backup
+            etl-backup | tee docker_output.log
+
+      - name: Enviar e-mail com log anexado
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: "ETL Backup Diário - ${{ job.status }}"
+          body: "O ETL diário foi executado. Segue anexo o log completo da execução."
+          to: fglibino@gmail.com
+          from: ${{ secrets.SMTP_USER }}
+          attachments: docker_output.log
